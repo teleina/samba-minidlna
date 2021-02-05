@@ -1,0 +1,37 @@
+# Este archivo instala dos servicios: MiniDLMA y SAMBA
+# Se baja las imagenes desde el repositorio de teleina
+# Crea en el HOST la carpeta "/media" para guardar los medios
+# Archivo creado por Javier Mur
+
+version: "3.3"
+services:
+
+  # Contenedor de MiniDLMA
+  minidlna:
+    container_name: MiniDLNA
+    image: teleina/minidlna:latest
+    restart: always
+    environment:
+      - MINIDLNA_MEDIA_DIR=/media
+      - MINIDLNA_FRIENDLY_NAME=MediaServer
+    network_mode: "host"
+    volumes:
+      - /media:/media
+
+  # Contenedor de SAMBA
+  samba:
+    container_name: SAMBA
+    image: teleina/samba:latest
+    restart: always
+    
+    ### DESCRIPCIÓN DE COMANDOS ###
+    # -u "usuario;password" -w "Grupo de trabajo" ==>
+    # -s "nombre;/dir. almacenamiento;navegable (yes o no);solo lectura (yes o no);invitado (yes o no); ==>
+    # usuarios permitidos (all o lista);administrador (none o lista);usuarios que pueden escribir (lista)"
+    command: '-u "javier;1234" -w "TELEINA" -s "media;/media;yes;no;yes;all;javier;javier;" -c "/home/pi/media:/media"'
+    stdin_open: true
+    tty: true
+    network_mode: "host"
+    volumes:
+       - "/usr/share/zoneinfo/Europe/Madrid:/etc/localtime"
+       - "/media:/media"
